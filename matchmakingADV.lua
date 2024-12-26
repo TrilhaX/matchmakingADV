@@ -161,6 +161,149 @@ function autonext()
 	end
 end
 
+function CheckErwinCount(erwin1)
+	return #erwin1 == 4
+end
+
+function UseActiveAttackE()
+	local goat = game.Players.LocalPlayer
+	local erwin1 = {}
+
+	while toggle do
+		erwin1 = {}
+
+		print("Buscando unidades 'erwin'...")
+
+		for _, v in pairs(game:GetService("Workspace")._UNITS:GetChildren()) do
+			if v.Name == "erwin" and v._stats.player.Value == goat then
+				table.insert(erwin1, v)
+			end
+		end
+
+		print("Erwins encontrados: ", #erwin1)
+
+		if CheckErwinCount(erwin1) then
+			print("Verificando se os 'erwins' são válidos...")
+
+			for i, erwin in ipairs(erwin1) do
+				if not toggle then
+					break
+				end
+
+				local endpoints = game:GetService("ReplicatedStorage"):WaitForChild("endpoints")
+				local client_to_server = endpoints:WaitForChild("client_to_server")
+				local use_active_attack = client_to_server:WaitForChild("use_active_attack")
+
+				print("Ativando ataque para Erwin: ", erwin)
+
+				use_active_attack:InvokeServer(erwin)
+				wait(15.7)
+			end
+		else
+			print("Número insuficiente de 'Erwins' para ativar o ataque.")
+		end
+		wait(2)
+	end
+end
+
+function CheckWendyCount(wendyTable)
+	return #wendyTable == 4
+end
+
+function UseActiveAttackW()
+	local player = game.Players.LocalPlayer
+	print("Iniciando a função UseActiveAttackW para", player.Name) -- Imprime o nome do jogador.
+
+	while toggle2 do
+		print("Verificando a presença do jogador e seu personagem...") -- Verificação do jogador e personagem.
+		repeat
+			wait(1)
+		until player and player.Character
+		print("Jogador e personagem encontrados:", player.Name)
+
+		local wendy1 = {}
+		print("Filtrando unidades Wendy...")
+
+		for _, unit in pairs(game:GetService("Workspace")._UNITS:GetChildren()) do
+			if (unit.Name == "wendy" or unit.Name == "wendy_halloween") and unit._stats.player.Value == player then
+				table.insert(wendy1, unit)
+				print("Unidade Wendy ou Wendy Halloween encontrada:", unit.Name)
+			end
+		end
+
+		print("Número de unidades Wendy ou Wendy Halloween controladas pelo jogador:", #wendy1)
+
+		if CheckWendyCount(wendy1) then
+			print("Número correto de unidades Wendy (4) encontrado, iniciando ataque ativo...")
+
+			if not toggle2 then
+				print("A execução do buff foi interrompida, toggle desativado.")
+				break
+			end
+			for _, wendyUnit in ipairs(wendy1) do
+				print("Ativando o ataque para a Wendy:", wendyUnit.Name)
+				game:GetService("ReplicatedStorage")
+					:WaitForChild("endpoints")
+					:WaitForChild("client_to_server")
+					:WaitForChild("use_active_attack")
+					:InvokeServer(wendyUnit)
+				print("Ataque ativo invocado para a Wendy:", wendyUnit.Name)
+				wait(15.8)
+			end
+		else
+			print("Número incorreto de unidades Wendy, não aplicando buff.")
+		end
+		wait(1)
+	end
+
+	print("Função UseActiveAttackW finalizada.")
+end
+
+function CheckLeafyCount(leafy1)
+	return #leafy1 == 4
+end
+
+function UseActiveAttackL()
+	local goat = game.Players.LocalPlayer
+	local leafy1 = {}
+
+	while toggle3 do
+		leafy1 = {}
+
+		print("Buscando unidades 'leafy'...")
+
+		for _, v in pairs(game:GetService("Workspace")._UNITS:GetChildren()) do
+			if v.Name == "leafy" and v._stats.player.Value == goat then
+				table.insert(leafy1, v)
+			end
+		end
+
+		print("leafy encontrados: ", #leafy1)
+
+		if CheckLeafyCount(leafy1) then
+			print("Verificando se os 'leafy' são válidos...")
+
+			for i, leafy in ipairs(leafy1) do
+				if not toggle3 then
+					break
+				end
+
+				local endpoints = game:GetService("ReplicatedStorage"):WaitForChild("endpoints")
+				local client_to_server = endpoints:WaitForChild("client_to_server")
+				local use_active_attack = client_to_server:WaitForChild("use_active_attack")
+
+				print("Ativando ataque para leafy: ", leafy)
+
+				use_active_attack:InvokeServer(leafy)
+				wait(15.7)
+			end
+		else
+			print("Número insuficiente de 'leafy' para ativar o ataque.")
+		end
+		wait(1)
+	end
+end
+
 -- START UI
 
 local Tabs = {
@@ -247,6 +390,45 @@ LeftGroupBox:AddToggle("AMH", {
 	Callback = function(Value)
 		getgenv().matchmakingHoliday = Value
 		autoMatchmakingHolidayEvent()
+	end,
+})
+
+local RightGroupbox = Tabs.Main:AddRightGroupbox("Buff")
+
+RightGroupbox:AddToggle("Auto Buff Erwin", {
+	Text = "Auto Buff Erwin",
+	Default = false,
+
+	Callback = function(Value)
+		toggle = Value
+		if toggle then
+			UseActiveAttackE()
+		end
+	end,
+})
+
+RightGroupbox:AddToggle("Auto Buff Wenda", {
+	Text = "Auto Buff Wenda",
+	Default = false,
+	Tooltip = "Auto Buff Wenda",
+
+	Callback = function(Value)
+		toggle2 = Value
+		if toggle2 then
+			UseActiveAttackW()
+		end
+	end,
+})
+
+RightGroupbox:AddToggle("Auto Buff Leafy", {
+	Text = "Auto Buff Leafy",
+	Default = false,
+
+	Callback = function(Value)
+		toggle3 = Value
+		if toggle3 then
+			UseActiveAttackL()
+		end
 	end,
 })
 
@@ -339,7 +521,7 @@ ThemeManager:ApplyToTab(TabsUI["UI Settings"])
 
 SaveManager:LoadAutoloadConfig()
 
-local GameConfigName = "_AA_MMH_"
+local GameConfigName = "_AA_MMH_f"
 local player = game.Players.LocalPlayer
 SaveManager:Load(player.Name .. GameConfigName)
 spawn(function()
