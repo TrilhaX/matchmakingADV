@@ -35,6 +35,39 @@ local speed = 1000
 
 --START OF FUNCTIONS
 
+function hideUIExec()
+	if getgenv().hideUIExec then
+		local windowFrame = game:GetService("CoreGui").LinoriaGui.windowFrame
+		windowFrame.Visible = false
+		wait()
+	end
+end
+
+function aeuat()
+	if getgenv().aeuat == true then
+		local teleportQueued = false
+		game.Players.LocalPlayer.OnTeleport:Connect(function(State)
+			if
+				(State == Enum.TeleportState.Started or State == Enum.TeleportState.InProgress) and not teleportQueued
+			then
+				teleportQueued = true
+
+				queue_on_teleport([[         
+                    repeat task.wait() until game:IsLoaded()
+                    wait(1)
+                    if getgenv().executed then return end    
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/TrilhaX/matchmakingADV/main/matchmakingADV.lua"))()
+                ]])
+
+				getgenv().executed = true
+				wait(10)
+				teleportQueued = false
+			end
+		end)
+		wait()
+	end
+end
+
 function autoMatchmakingHolidayEvent()
     while getgenv().matchmakingHoliday == true do
         game:GetService("ReplicatedStorage").endpoints.client_to_server.request_matchmaking:InvokeServer("christmas_event")
